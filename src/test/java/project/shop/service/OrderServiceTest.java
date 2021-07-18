@@ -90,8 +90,6 @@ class OrderServiceTest {
 
     }
 
-
-
     public Member createMember() {
         Member member = new Member();
         member.setName("user1");
