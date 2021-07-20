@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import project.shop.domain.Address;
 import project.shop.domain.Member;
 import project.shop.service.MemberService;
-import project.shop.web.controller.dto.AddressDto;
 
-import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,23 +29,39 @@ public class MemberController {
     }
 
     @PostMapping("/members/new")
-    public String create(@Valid MemberForm form, BindingResult result) {
+    public String create(@Validated MemberForm form, BindingResult result) {
         log.info("create controller");
-        log.info("result = {}", result.getAllErrors());
 
         if (result.hasErrors()) {
             return "members/createMemberForm";
         }
 
-        Address address = new Address(form.getCity(), form.getStreet(), form.getZipcode());
-
-        Member member = new Member();
-        member.setName(form.getName());
-        member.setAddress(address);
+        Member member = getMember(form.getName(), form.getCity(), form.getStreet(), form.getZipcode());
 
         memberService.join(member);
 
         return "redirect:/";
     }
 
+    @GetMapping("/members")
+    public String list(Model model) {
+
+        List<Member> members = memberService.findMembers();
+        model.addAttribute("members", members);
+
+        return "members/memberList";
+    }
+
+    public Address getAddress(String city, String street, String zipcode) {
+        return new Address(city, street, zipcode);
+    }
+
+    public Member getMember(String name, String city, String street, String zipcode) {
+
+        Member member = new Member();
+        member.setName(name);
+        member.setAddress(new Address(city, street, zipcode));
+
+        return member;
+    }
 }
