@@ -6,6 +6,7 @@ import project.shop.domain.Member;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,5 +31,11 @@ public class MemberRepository {
         return em.createQuery("select m from Member m where m.name = :name")
                 .setParameter("name", name)
                 .getResultList();
+    }
+
+    public Optional<Member> findByLoginId(String loginId) {
+        return findAll().stream()
+                .filter(m -> m.getLoginId().equals(loginId))
+                .findFirst();
     }
 }

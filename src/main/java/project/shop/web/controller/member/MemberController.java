@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import project.shop.domain.Address;
 import project.shop.domain.Member;
@@ -29,14 +31,20 @@ public class MemberController {
     }
 
     @PostMapping("/members/new")
-    public String create(@Validated MemberForm form, BindingResult result) {
+    public String create(@Validated @ModelAttribute MemberForm form, BindingResult result) {
         log.info("create controller");
 
+        if (!(form.getPassword().equals(form.getRe_password()))) {
+            log.info("password= {}, re_password= {}", form.getPassword(), form.getRe_password());
+            result.addError(new ObjectError("memberForm", "비밀번호가 일치하지 않습니다."));
+        }
+
         if (result.hasErrors()) {
+            log.info("errors= {}", result);
             return "members/createMemberForm";
         }
 
-        Member member = getMember(form.getName(), form.getCity(), form.getStreet(), form.getZipcode());
+        Member member = getMember(form.getName(), form.getLoginId(), form.getPassword(), form.getCity(), form.getStreet(), form.getZipcode());
 
         memberService.join(member);
 
@@ -52,14 +60,16 @@ public class MemberController {
         return "members/memberList";
     }
 
-    public Address getAddress(String city, String street, String zipcode) {
+    private Address getAddress(String city, String street, String zipcode) {
         return new Address(city, street, zipcode);
     }
 
-    public Member getMember(String name, String city, String street, String zipcode) {
+    private Member getMember(String name, String loginId, String password, String city, String street, String zipcode) {
 
         Member member = new Member();
         member.setName(name);
+        member.setLoginId(loginId);
+        member.setPassword(password);
         member.setAddress(new Address(city, street, zipcode));
 
         return member;

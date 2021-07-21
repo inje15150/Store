@@ -12,5 +12,7 @@ public class HomeController {
     public String home() {
         log.info("home controller");
         return "home";
+
+
     }
 }
