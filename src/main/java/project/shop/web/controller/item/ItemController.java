@@ -3,6 +3,7 @@ package project.shop.web.controller.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +15,8 @@ import project.shop.domain.item.Book;
 import project.shop.domain.item.Item;
 import project.shop.domain.item.Movie;
 import project.shop.service.ItemService;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,6 +45,14 @@ public class ItemController {
         return "redirect:/items";
     }
 
+    @GetMapping("/items")
+    public String itemList(Model model) {
+        List<Item> items = itemService.findItems();
+        model.addAttribute("items", items);
+
+        return "items/itemList";
+    }
+
     private Item getItem(String itemName, int price, int stockQuantity, String selectItem) {
 
         log.info("getItem call");
@@ -54,6 +65,4 @@ public class ItemController {
 
         return item;
     }
-
-
 }
