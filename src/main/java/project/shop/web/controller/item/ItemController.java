@@ -9,6 +9,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import project.shop.domain.item.Album;
 import project.shop.domain.item.Book;
@@ -16,6 +17,7 @@ import project.shop.domain.item.Item;
 import project.shop.domain.item.Movie;
 import project.shop.service.ItemService;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -51,6 +53,40 @@ public class ItemController {
         model.addAttribute("items", items);
 
         return "items/itemList";
+    }
+
+    @GetMapping("/items/{itemId}/edit")
+    public String updateItemForm(@PathVariable("itemId") Long itemId, Model model) {
+
+        Item item = itemService.findOne(itemId);
+
+        ItemForm form = getUpdateForm(item.getId(), item.getName(), item.getPrice(), item.getStockQuantity());
+
+        model.addAttribute("form", form);
+
+        return "items/updateItemForm";
+    }
+
+    @PostMapping("/items/{itemId}/edit")
+    public String updateItem(@PathVariable("itemId") Long itemId, @Validated @ModelAttribute("form") ItemForm form, BindingResult bindingResult) {
+
+        log.info("updateItem POST controller");
+        if (bindingResult.hasErrors()) {
+            return "items/updateItemForm";
+        }
+
+//        SelectItem[] values = SelectItem.values();
+//        for (SelectItem value : values) {
+//            System.out.println(value);
+//        }
+
+        itemService.update(form.getItemId(), form.getItemName(), form.getPrice(), form.getStockQuantity());
+
+        return "redirect:/items";
+    }
+
+    private ItemForm getUpdateForm(Long itemId, String itemName, int price, int stockQuantity) {
+        return new ItemForm(itemId, itemName, price, stockQuantity);
     }
 
     private Item getItem(String itemName, int price, int stockQuantity, String selectItem) {

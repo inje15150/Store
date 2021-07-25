@@ -1,14 +1,18 @@
 package project.shop.web.controller.item;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
 public class ItemForm {
+
+    private Long itemId;
 
     @NotEmpty(message = "상품 이름을 입력해주세요.")
     private String itemName;
@@ -23,4 +27,11 @@ public class ItemForm {
 
     @NotEmpty(message = "상품 종류를 선택해주세요.")
     private String selectItem;
+
+    public ItemForm(Long itemId, String itemName, Integer price, Integer stockQuantity) {
+        this.itemId = itemId;
+        this.itemName = itemName;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+    }
 }

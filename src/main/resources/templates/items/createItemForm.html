@@ -16,7 +16,7 @@
     <div th:replace="fragments/bodyHeader :: bodyHeader" />
 
     <form role="form" action="/items/new" th:object="${itemForm}" method="post">
-        <h2>상품 등록</h2>
+        <h2 class="text-center">상품 등록</h2>
 
         <div th:if="${#fields.hasGlobalErrors()}">
             <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">글로벌 오류 메시지</p>
@@ -54,7 +54,8 @@
             <div class="field-error" th:errors="*{stockQuantity}">Incorrect date</div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">확인</button>
+        <a type="button" href="/" class="btn btn-primary">취소</a>
 
     </form>
     <br/>

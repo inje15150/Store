@@ -14,6 +14,7 @@
                 <th>상품 이름</th>
                 <th>상품 가격</th>
                 <th>상품 재고</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -22,6 +23,10 @@
                 <td th:text="${item.name}"></td>
                 <td th:text="${item.price}"></td>
                 <td th:text="${item.stockQuantity}"></td>
+                <td>
+                    <a href="#" th:href="@{/items/{id}/edit (id=${item.id})}"
+                       class="btn btn-primary" role="button">수정</a>
+                </td>
             </tr>
             </tbody>
         </table>

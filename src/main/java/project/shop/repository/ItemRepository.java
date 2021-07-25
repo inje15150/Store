@@ -29,4 +29,14 @@ public class ItemRepository {
         return em.createQuery("select i from Item i", Item.class)
                 .getResultList();
     }
+
+
+    public void update(Long itemId, String itemName, Integer price, Integer stockQuantity) {
+
+        Item item = em.find(Item.class, itemId);
+        item.setName(itemName);
+        item.setPrice(price);
+        item.setStockQuantity(stockQuantity);
+    }
+
 }
