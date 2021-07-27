@@ -1,6 +1,7 @@
 package project.shop.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.shop.domain.*;
@@ -9,15 +10,17 @@ import project.shop.repository.ItemRepository;
 import project.shop.repository.MemberRepository;
 import project.shop.repository.OrderRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
-
     /**
      * 주문
      */
@@ -26,6 +29,8 @@ public class OrderService {
 
         //엔티티 조회
         Member member = memberRepository.findOne(memberId);
+        log.info("member = {}", member);
+
         Item item = itemRepository.findOne(itemId);
 
         //배송정보 생성
@@ -45,9 +50,13 @@ public class OrderService {
         return order.getId();
     }
 
+    public List<Order> findOrders(OrderSearch orderSearch) {
+        return orderRepository.findAllByString(orderSearch);
+    }
     /**
      * 주문 취소
      */
+    @Transactional
     public void cancelOrder(Long orderId) {
         Order order = orderRepository.findOne(orderId);
 

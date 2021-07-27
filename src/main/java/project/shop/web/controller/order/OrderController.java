@@ -5,10 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import project.shop.domain.Member;
+import project.shop.domain.Order;
+import project.shop.domain.OrderSearch;
 import project.shop.domain.item.Item;
 import project.shop.service.ItemService;
 import project.shop.service.MemberService;
@@ -38,7 +42,25 @@ public class OrderController {
     }
 
     @PostMapping("/order")
-    public String createOrder(@ModelAttribute OrderForm form, BindingResult bindingResult) {
-        return null;
+    public String createOrder(@RequestParam("memberId") Long memberId,
+                              @RequestParam("itemId") Long itemId,
+                              @RequestParam("count") int count) {
+        log.info("createOrder call");
+
+        orderService.order(memberId, itemId, count);
+
+        return "redirect:/orders";
+    }
+
+    @GetMapping("/orders")
+    public String orderList(@ModelAttribute("orderSearch") OrderSearch orderSearch, Model model) {
+
+        log.info("orderList Controller call");
+        List<Order> orders = orderService.findOrders(orderSearch);
+
+
+        model.addAttribute("orders", orders);
+
+        return "order/orderList";
     }
 }

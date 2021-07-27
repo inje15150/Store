@@ -27,6 +27,10 @@ public class Item {
 
     private int stockQuantity;
 
+    public void update(Item item) {
+
+    }
+
     @ManyToMany(mappedBy = "items")
     private List<Category> categories = new ArrayList<>();
 
