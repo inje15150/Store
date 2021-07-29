@@ -17,7 +17,7 @@ public class ItemForm {
     @NotEmpty(message = "상품 이름을 입력해주세요.")
     private String itemName;
 
-    @NotNull(message = "상품 가격을 입력해주세요.")
+    @NotNull(message = "가격을 입력해주세요.")
     @Range(min = 1000, max = 1000000, message = "가격은 1,000원 부터 1,000,000원까지 등록 가능합니다.")
     private Integer price;
 

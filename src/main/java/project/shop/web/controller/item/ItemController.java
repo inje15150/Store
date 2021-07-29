@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,10 +69,11 @@ public class ItemController {
     }
 
     @PostMapping("/items/{itemId}/edit")
-    public String updateItem(@PathVariable("itemId") Long itemId, @Validated @ModelAttribute("form") ItemForm form, BindingResult bindingResult) {
+    public String updateItem(@Validated @ModelAttribute("form") ItemForm form, BindingResult bindingResult, Model model) {
 
         log.info("updateItem POST controller");
         if (bindingResult.hasErrors()) {
+            model.addAttribute("form", form);
             return "items/updateItemForm";
         }
 

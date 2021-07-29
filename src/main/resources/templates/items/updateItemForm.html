@@ -1,10 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
+<head th:replace="fragments/header :: header"></head>
 <style>
-    .fieldError {
-        border-color: #bd2130;
-    }
     .field-error {
         border-color: #dc3545;
         color: #dc3545;
@@ -13,7 +10,7 @@
 
 <body>
 <div class="container">
-  <div th:replace="fragments/bodyHeader :: bodyHeader" />
+  <div th:replace="fragments/bodyHeader :: bodyHeader"></div>
 
   <form role="form" th:action="@{/items/{itemId}/edit (itemId=${form.itemId})}" th:object="${form}" method="post">
     <h2 class="text-center">상품 수정</h2>
@@ -46,7 +43,7 @@
 
     <div class="form-group">
       <label th:for="stockQuantity">상품 재고</label>
-      <input type="text" th:field="*{stockQuantity}" class="form-control" placeholder="비밀번호를 다시 입력하세요"
+      <input type="text" th:field="*{stockQuantity}" class="form-control" placeholder="상품 재고를 입력하세요."
              th:errorclass="field-error">
       <div class="field-error" th:errors="*{stockQuantity}">Incorrect date</div>
     </div>
@@ -56,7 +53,7 @@
 
   </form>
   <br/>
-  <div th:replace="fragments/footer :: footer" />
+  <div th:replace="fragments/footer :: footer"></div>
 </div> <!-- /container -->
 </body>
 </html>
