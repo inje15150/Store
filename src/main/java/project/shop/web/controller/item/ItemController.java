@@ -69,11 +69,13 @@ public class ItemController {
     }
 
     @PostMapping("/items/{itemId}/edit")
-    public String updateItem(@Validated @ModelAttribute("form") ItemForm form, BindingResult bindingResult, Model model) {
+    public String updateItem(@PathVariable("itemId") Long itemId, @Validated @ModelAttribute("form") ItemForm form, BindingResult bindingResult, Model model) {
 
         log.info("updateItem POST controller");
+
         if (bindingResult.hasErrors()) {
-            model.addAttribute("form", form);
+            model.addAttribute("itemId", itemId);
+
             return "items/updateItemForm";
         }
 
@@ -81,7 +83,6 @@ public class ItemController {
 //        for (SelectItem value : values) {
 //            System.out.println(value);
 //        }
-
         itemService.update(form.getItemId(), form.getItemName(), form.getPrice(), form.getStockQuantity());
 
         return "redirect:/items";

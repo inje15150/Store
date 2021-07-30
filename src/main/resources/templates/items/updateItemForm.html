@@ -12,7 +12,7 @@
 <div class="container">
   <div th:replace="fragments/bodyHeader :: bodyHeader"></div>
 
-  <form role="form" th:action="@{/items/{itemId}/edit (itemId=${form.itemId})}" th:object="${form}" method="post">
+  <form role="form" th:action="@{/items/{itemId}/edit (itemId=${itemId})}" th:object="${form}" method="post">
     <h2 class="text-center">상품 수정</h2>
 
     <div class="form-group">
