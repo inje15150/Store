@@ -9,13 +9,16 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import project.shop.domain.Member;
 import project.shop.service.LoginService;
 import project.shop.session.SessionManager;
+import project.shop.web.SessionConst;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @Slf4j
@@ -23,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController {
 
     private final LoginService loginService;
-    private final SessionManager sessionManager;
 
     @GetMapping("/login")
     public String loginForm(@ModelAttribute LoginForm form) {
@@ -31,11 +33,11 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute("loginForm") LoginForm form, BindingResult bindingResult, HttpServletResponse response) {
+    public String login(@Validated @ModelAttribute("loginForm") LoginForm form, BindingResult bindingResult,
+                        @RequestParam(defaultValue = "/") String redirectURL, HttpServletRequest request) {
 
         log.info("login controller");
-        log.info("form.getLoginId= {}", form.getLoginId());
-        log.info("form.getPassword= {}", form.getPassword());
+        log.info("redirectURL= {}", redirectURL);
 
         Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
         log.info("login? {}", loginMember);
@@ -49,15 +51,21 @@ public class LoginController {
             return "login/loginForm";
         }
         //로그인 성공 처리
-        sessionManager.createSession(loginMember, response);
+//        sessionManager.createSession(loginMember, response);
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
-        return "redirect:/";
+        return "redirect:" + redirectURL;
     }
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
 
-        sessionManager.expire(request);
+        HttpSession session = request.getSession();
+        if (session != null) {
+            session.invalidate();
+        }
+//        sessionManager.expire(request);
 
         return "redirect:/";
     }
