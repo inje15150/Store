@@ -11,6 +11,7 @@ import project.shop.domain.Member;
 import project.shop.domain.Order;
 import project.shop.domain.OrderSearch;
 import project.shop.domain.item.Item;
+import project.shop.exception.NoEnoughStockException;
 import project.shop.service.ItemService;
 import project.shop.service.MemberService;
 import project.shop.service.OrderService;

@@ -28,7 +28,7 @@ public class LoginController {
     private final LoginService loginService;
 
     @GetMapping("/login")
-    public String loginForm(@ModelAttribute LoginForm form) {
+    public String loginForm(@ModelAttribute("loginForm") LoginForm form) {
         return "login/loginForm";
     }
 

@@ -34,6 +34,10 @@ public class MemberController {
     public String create(@Validated @ModelAttribute MemberForm form, BindingResult result) {
         log.info("create controller");
 
+        if (memberService.validateDuplicateMember(form.getLoginId()) != null) {
+            result.addError(new ObjectError("memberForm", "이미 존재하는 아이디입니다."));
+        }
+
         if (!(form.getPassword().equals(form.getRe_password()))) {
             log.info("password= {}, re_password= {}", form.getPassword(), form.getRe_password());
             result.addError(new ObjectError("memberForm", "비밀번호가 일치하지 않습니다."));

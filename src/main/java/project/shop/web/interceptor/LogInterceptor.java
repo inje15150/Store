@@ -43,6 +43,7 @@ public class LogInterceptor implements HandlerInterceptor {
         if (ex != null) {
             log.error("afterCompletion error!!", ex);
         }
+        log.info("redirectURL={}", request.getParameter("redirectURL"));
         log.info("RESPONSE [{}][{}][{}]", uuid, requestURI, handler);
     }
 }

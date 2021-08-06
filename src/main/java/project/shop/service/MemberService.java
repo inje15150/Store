@@ -7,6 +7,7 @@ import project.shop.domain.Member;
 import project.shop.repository.MemberRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +18,6 @@ public class MemberService {
 
     @Transactional
     public Long join(Member member) {
-        validateDuplicateMember(member);
         memberRepository.save(member);
         return member.getId();
     }
@@ -25,12 +25,8 @@ public class MemberService {
     /**
      * 회원 검증
      */
-    private void validateDuplicateMember(Member member) {
-        List<Member> findMembers = memberRepository.findByName(member.getName());
-
-        if (!findMembers.isEmpty()) {
-            throw new IllegalStateException("이미 존재하는 회원입니다."); // 이름으로 검색 후 존재하면 exception throw
-        }
+    public Member validateDuplicateMember(String loginId) {
+        return memberRepository.findByLoginId(loginId).orElse(null);
     }
 
     /**
