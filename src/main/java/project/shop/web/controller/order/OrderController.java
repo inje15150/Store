@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.shop.domain.Member;
@@ -35,17 +36,40 @@ public class OrderController {
 
         model.addAttribute("members", members);
         model.addAttribute("items", items);
+        model.addAttribute("orderForm", new OrderForm());
 
         return "order/orderForm";
     }
 
     @PostMapping("/order")
-    public String createOrder(@RequestParam("memberId") Long memberId,
-                              @RequestParam("itemId") Long itemId,
-                              @RequestParam("count") int count) {
+    public String createOrder(//@RequestParam("memberId") Long memberId,
+                              //@RequestParam("itemId") Long itemId,
+                              //@RequestParam("count") int count,
+                              @Validated @ModelAttribute("orderForm") OrderForm orderForm, BindingResult bindingResult, Model model) {
         log.info("createOrder call");
 
-        orderService.order(memberId, itemId, count);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("members", memberService.findMembers());
+            model.addAttribute("items", itemService.findItems());
+            return "order/orderForm";
+        }
+
+        Item findItem = itemService.findOne(orderForm.getItemId());
+
+        if (findItem.getStockQuantity() < orderForm.getCount()) {
+            bindingResult.addError(new ObjectError("orderForm", "주문 수량을 초과하였습니다. 현재 주문 가능 수량은 " + findItem.getStockQuantity() +"개 입니다."));
+        }
+        if (orderForm.getCount() == 0) {
+            bindingResult.addError(new ObjectError("orderForm", "1개 이상 주문을 해야합니다."));
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("members", memberService.findMembers());
+            model.addAttribute("items", itemService.findItems());
+            return "order/orderForm";
+        }
+
+        orderService.order(orderForm.getMemberId(), orderForm.getItemId(), orderForm.getCount());
 
         return "redirect:/orders";
     }
