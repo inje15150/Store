@@ -3,6 +3,7 @@ package project.shop.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.shop.domain.Address;
 import project.shop.domain.Member;
 import project.shop.repository.MemberRepository;
 
@@ -40,4 +41,14 @@ public class MemberService {
         return memberRepository.findOne(memberId);
     }
 
+    @Transactional
+    public void update(Long id, String password, Address address) throws Exception {
+        Member member = memberRepository.findOne(id);
+
+        if (member.getPassword().equals(password)) {
+            throw new Exception("기존 비밀번호와 동일합니다.");
+        }
+        member.setPassword(password);
+        member.setAddress(address);
+    }
 }

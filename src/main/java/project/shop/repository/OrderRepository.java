@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.stylesheets.LinkStyle;
+import project.shop.api.v1.orders.dto.OrderDto;
 import project.shop.domain.Order;
 import project.shop.domain.OrderSearch;
 
@@ -64,4 +65,13 @@ public class OrderRepository {
 
         return query.getResultList();
     }
+
+    public List<Order> findAllMemberDelivery() {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class
+        ).getResultList();
+    }
+
 }
