@@ -1,11 +1,14 @@
-package project.shop.api.v1.orders.dto;
+package project.shop.api.v1.orders.dto.read;
 
 import lombok.Data;
 import project.shop.domain.Address;
 import project.shop.domain.Order;
+import project.shop.domain.OrderItem;
 import project.shop.domain.OrderStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class OrderDto {
@@ -15,8 +18,9 @@ public class OrderDto {
     private LocalDateTime orderDate;
     private OrderStatus status;
     private Address address;
+    private List<OrderItemDto> orderItems;
 
-    public OrderDto(Long orderId, String name, LocalDateTime orderDate, OrderStatus status, Address address) {
+    public OrderDto(Long orderId, String name, LocalDateTime orderDate, OrderStatus status, Address address, OrderItem orderItem) {
         this.orderId = orderId;
         this.name = name;
         this.orderDate = orderDate;
@@ -30,5 +34,9 @@ public class OrderDto {
         orderDate = order.getOrderDate();
         status = order.getStatus();
         address = order.getDelivery().getAddress();
+        orderItems = order.getOrderItems().stream()
+                .map(orderItem -> new OrderItemDto(orderItem))
+                .collect(Collectors.toList());
+
     }
 }

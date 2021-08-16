@@ -41,14 +41,19 @@ public class MemberService {
         return memberRepository.findOne(memberId);
     }
 
-    @Transactional
-    public void update(Long id, String password, Address address) throws Exception {
-        Member member = memberRepository.findOne(id);
+    public Long findByName(String name) {
+        return memberRepository.findByName(name);
+    }
 
-        if (member.getPassword().equals(password)) {
-            throw new Exception("기존 비밀번호와 동일합니다.");
-        }
+    @Transactional
+    public void update(Long id, String password, Address address) {
+        Member member = memberRepository.findOne(id);
         member.setPassword(password);
         member.setAddress(address);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        memberRepository.delete(id);
     }
 }

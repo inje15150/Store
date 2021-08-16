@@ -11,9 +11,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        default_batch_size: 100
+        default_batch_fetch_size: 100
   messages:
     basename: errors
+  logging:
+    level:
+      p6spy: info
 
 #  thymeleaf:
 #    prefix: classpath:/templates/

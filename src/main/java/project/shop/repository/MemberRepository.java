@@ -3,6 +3,7 @@ package project.shop.repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import project.shop.domain.Address;
 import project.shop.domain.Member;
 
 import javax.persistence.EntityManager;
@@ -28,15 +29,20 @@ public class MemberRepository {
                 .getResultList();
     }
 
-    public List<Member> findByName(String name) {
-        return em.createQuery("select m from Member m where m.name = :name",Member.class)
+    public Long findByName(String name) {
+        return (Long) em.createQuery("select m from Member m where m.name = :name", Member.class)
                 .setParameter("name", name)
-                .getResultList();
+                .getParameterValue(name);
     }
 
     public Optional<Member> findByLoginId(String loginId) {
         return findAll().stream()
                 .filter(m -> m.getLoginId().equals(loginId))
                 .findFirst();
+    }
+
+    public void delete(Long id) {
+        Member member = findOne(id);
+        em.remove(member);
     }
 }

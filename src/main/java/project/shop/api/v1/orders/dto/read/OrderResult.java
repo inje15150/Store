@@ -1,4 +1,4 @@
-package project.shop.api.v1.orders.dto;
+package project.shop.api.v1.orders.dto.read;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.shop.api.v1.orders.dto.create.OrderCreateRequest;
 import project.shop.domain.item.Item;
 import project.shop.repository.ItemRepository;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,4 +37,8 @@ public class ItemService {
         itemRepository.update(itemId, itemName, price, stockQuantity);
     }
 
+    public Long findByName(String name) {
+
+        return itemRepository.findByName(name);
+    }
 }

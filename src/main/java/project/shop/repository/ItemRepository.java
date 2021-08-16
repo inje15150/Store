@@ -2,6 +2,7 @@ package project.shop.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import project.shop.api.v1.orders.dto.create.OrderCreateRequest;
 import project.shop.domain.item.Item;
 
 import javax.persistence.EntityManager;
@@ -39,4 +40,12 @@ public class ItemRepository {
         item.setStockQuantity(stockQuantity);
     }
 
+    public Long findByName(String name) {
+
+        return (Long) em.createQuery(
+                "select i from Item i" +
+                        " where i.name= :name", Item.class)
+                .setParameter("name", name)
+                .getParameterValue(name);
+    }
 }

@@ -8,5 +8,8 @@ import lombok.Data;
 public class CreateMemberResponse {
 
     private Long id;
+    private String name;
+    private String method;
+
 
 }

@@ -1,4 +1,4 @@
-package project.shop.api.v1.members.dto.update;
+package project.shop.api.v1.members.dto.delete;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,12 +6,10 @@ import org.springframework.http.HttpStatus;
 
 @Data
 @AllArgsConstructor
-public class UpdateMemberResponse {
+public class DeleteMemberResponse {
 
     private String requestURI;
-    private String method;
     private Long id;
-    private String name;
+    private String method;
     private HttpStatus status;
-
 }
