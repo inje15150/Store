@@ -19,8 +19,8 @@ public class ItemService {
     private final ItemRepository itemRepository;
 
     @Transactional
-    public void saveItem(Item item) {
-        itemRepository.save(item);
+    public Long saveItem(Item item) {
+        return itemRepository.save(item);
     }
 
     public List<Item> findItems() {
@@ -38,7 +38,11 @@ public class ItemService {
     }
 
     public Long findByName(String name) {
+        return itemRepository.findByName(name).getId();
+    }
 
-        return itemRepository.findByName(name);
+    @Transactional
+    public void delete(Long itemId) {
+        itemRepository.delete(itemId);
     }
 }

@@ -29,10 +29,17 @@ public class MemberRepository {
                 .getResultList();
     }
 
-    public Long findByName(String name) {
-        return (Long) em.createQuery("select m from Member m where m.name = :name", Member.class)
+    public Member findByName(String name) {
+
+        if (name == null) {
+            return em.createQuery(
+                    "select m from Member m", Member.class)
+                    .getSingleResult();
+        }
+
+        return em.createQuery("select m from Member m where m.name = :name", Member.class)
                 .setParameter("name", name)
-                .getParameterValue(name);
+                .getSingleResult();
     }
 
     public Optional<Member> findByLoginId(String loginId) {

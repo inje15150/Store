@@ -42,7 +42,7 @@ public class MemberService {
     }
 
     public Long findByName(String name) {
-        return memberRepository.findByName(name);
+        return memberRepository.findByName(name).getId();
     }
 
     @Transactional

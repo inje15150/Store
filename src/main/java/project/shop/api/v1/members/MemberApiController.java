@@ -9,7 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.shop.api.v1.members.dto.Errors;
+import project.shop.api.v1.Errors;
 import project.shop.api.v1.members.dto.delete.DeleteMemberResponse;
 import project.shop.api.v1.members.dto.read.MemberDto;
 import project.shop.api.v1.members.dto.read.MemberResult;

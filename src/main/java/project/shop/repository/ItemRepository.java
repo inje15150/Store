@@ -14,12 +14,14 @@ public class ItemRepository {
 
     private final EntityManager em;
 
-    public void save(Item item) {
+    public Long save(Item item) {
         if (item.getId() == null) {
             em.persist(item);
+            return item.getId();
         } else {
             em.merge(item);
         }
+        return null;
     }
 
     public Item findOne(Long id) {
@@ -40,12 +42,23 @@ public class ItemRepository {
         item.setStockQuantity(stockQuantity);
     }
 
-    public Long findByName(String name) {
+    public Item findByName(String name) {
 
-        return (Long) em.createQuery(
+        if (name == null) {
+            return em.createQuery(
+                    "select i from Item i", Item.class)
+                    .getSingleResult();
+        }
+
+        return em.createQuery(
                 "select i from Item i" +
-                        " where i.name= :name", Item.class)
+                        " where i.name = :name", Item.class)
                 .setParameter("name", name)
-                .getParameterValue(name);
+                .getSingleResult();
+    }
+
+    public void delete(Long itemId) {
+        Item findItem = findOne(itemId);
+        em.remove(findItem);
     }
 }

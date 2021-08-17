@@ -1,4 +1,4 @@
-package project.shop.api.v1.members.dto;
+package project.shop.api.v1;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
