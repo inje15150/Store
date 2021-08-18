@@ -10,6 +10,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.shop.api.v1.Errors;
+import project.shop.api.v1.members.converter.MemberParameterParsing;
+import project.shop.api.v1.members.converter.StringToMemberParameter;
 import project.shop.api.v1.members.dto.delete.DeleteMemberResponse;
 import project.shop.api.v1.members.dto.read.MemberDto;
 import project.shop.api.v1.members.dto.read.MemberResult;
@@ -30,19 +32,37 @@ import java.util.stream.Collectors;
 public class MemberApiController {
 
     private final MemberService memberService;
-
     /*
     * 회원목록 API
     * */
+
     @GetMapping("/api/v1/members")
-    public MemberResult<MemberDto> members() {
-        List<Member> findMembers = memberService.findMembers();
-        List<MemberDto> collect = findMembers.stream()
-                .map(m -> new MemberDto(m.getLoginId(), m.getName()))
+    public ResponseEntity conditionMemberSearch(@RequestParam String query) {
+
+        log.info("query= {}", query);
+
+        if (query == null) {
+            List<Member> findMembers = memberService.findMembers();
+            List<MemberDto> collect = changeMemberDto(findMembers);
+            return new ResponseEntity(new MemberResult(collect.size(), collect), HttpStatus.OK);
+        }
+
+        StringToMemberParameter convert = new StringToMemberParameter();
+        String name = convert.convert(query).getName();
+        String city = convert.convert(query).getCity();
+
+        List<Member> findMembers = memberService.findMembers(name, city);
+        List<MemberDto> collect = changeMemberDto(findMembers);
+
+        return new ResponseEntity(new MemberResult(collect.size(), collect), HttpStatus.OK);
+    }
+
+    // MemberDto 로 변환 후 리턴
+    private List<MemberDto> changeMemberDto(List<Member> findMembers) {
+
+        return findMembers.stream()
+                .map(m -> new MemberDto(m.getLoginId(), m.getName(), m.getAddress()))
                 .collect(Collectors.toList());
-
-        return new MemberResult(collect.size(), collect);
-
     }
 
     /*
