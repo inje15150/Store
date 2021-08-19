@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +38,7 @@ public class MemberApiController {
     * */
 
     @GetMapping("/api/v1/members")
-    public ResponseEntity conditionMemberSearch(@RequestParam String query) {
+    public ResponseEntity conditionMemberSearch(@RequestParam @Nullable String query) {
 
         log.info("query= {}", query);
 

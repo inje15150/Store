@@ -9,25 +9,25 @@ public class StringToMemberParameter implements Converter<String, MemberParamete
     @Override
     public MemberParameterParsing convert(String source) {
         log.info("convert source= {}", source);
-        String name = null;
-        String city = null;
 
-        //name %3D kim & %3D city=aaa
-        String[] params = source.split("&");
-
+//        query=   name=kim,city=aaa
+        String[] params = source.split(",");
 
         if (params.length == 2) {
-            name = params[0].split("%3D")[1];
-            city = params[1].split("%3D")[1];
+            //params[0] = name=kim
+            //params[1] = city=aaa
+            String name = params[0].split("=")[1];
+            String city = params[1].split("=")[1];
+
+            return new MemberParameterParsing(name, city);
         }
+
         if (params.length == 1) {
-            if (params[0].equals("name")) {
-                name = params[0].split("%3D")[1];
-            }
-            if (params[0].equals("city")) {
-                city = params[0].split("%3D")[1];
-            }
+            //params[0] = name=kim, params[1] = city=aaa
+            String[] split = params[0].split("=");
+
+            return new MemberParameterParsing(split[0], split[1]);
         }
-        return new MemberParameterParsing(name, city);
+        return null;
     }
 }
