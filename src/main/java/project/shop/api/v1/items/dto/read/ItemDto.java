@@ -9,6 +9,6 @@ import lombok.Data;
 public class ItemDto {
 
     private String itemName;
-    private int itemPrice;
-    private int count;
+    private Integer itemPrice;
+    private Integer stockQuantity;
 }

@@ -1,11 +1,14 @@
 package project.shop.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.type.IntegerType;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 import project.shop.api.v1.orders.dto.create.OrderCreateRequest;
 import project.shop.domain.item.Item;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
@@ -42,6 +45,53 @@ public class ItemRepository {
         item.setStockQuantity(stockQuantity);
     }
 
+    public List<Item> findByCondition(String itemName, Integer price, String sign) {
+
+        String jpql = "select i from Item i";
+        boolean isFirstCondition = true;
+
+        if (StringUtils.hasText(itemName)) {
+            if (isFirstCondition) {
+                jpql += " where";
+                isFirstCondition = false;
+            } else {
+                jpql += " and";
+            }
+            jpql += " i.name like '%'||:name||'%'";
+        }
+
+        if (StringUtils.hasText(String.valueOf(price))) {
+
+            if (sign != null) {
+                if (isFirstCondition) {
+                    jpql += " where";
+                    isFirstCondition = false;
+                } else {
+                    jpql += " and";
+                }
+                jpql += " i.price " + sign + " :price";
+            } else {
+                if (isFirstCondition) {
+                    jpql += " where";
+                    isFirstCondition = false;
+                } else {
+                    jpql += " and";
+                }
+                jpql += " i.price = :price";
+            }
+        }
+
+        TypedQuery<Item> query = em.createQuery(jpql, Item.class);
+
+        if (StringUtils.hasText(itemName)) {
+            query = query.setParameter("name", itemName);
+        }
+        if (StringUtils.hasText(String.valueOf(price))) {
+            query = query.setParameter("price", price);
+        }
+        return query.getResultList();
+    }
+
     public Item findByName(String name) {
 
         if (name == null) {
@@ -61,4 +111,6 @@ public class ItemRepository {
         Item findItem = findOne(itemId);
         em.remove(findItem);
     }
+
+
 }

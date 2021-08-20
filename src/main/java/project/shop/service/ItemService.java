@@ -23,8 +23,14 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
+    // item 전체 조회
     public List<Item> findItems() {
         return itemRepository.findALl();
+    }
+
+    // item 조건 조회
+    public List<Item> findItems(String itemName, Integer price, String sign) {
+        return itemRepository.findByCondition(itemName, price, sign);
     }
 
     public Item findOne(Long itemId) {
@@ -45,4 +51,6 @@ public class ItemService {
     public void delete(Long itemId) {
         itemRepository.delete(itemId);
     }
+
+
 }

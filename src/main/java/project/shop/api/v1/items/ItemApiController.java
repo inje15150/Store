@@ -5,10 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.shop.api.v1.converter.ItemParameterMapping;
+import project.shop.api.v1.converter.StringToItemParameter;
 import project.shop.api.v1.items.dto.create.CreateItemRequest;
 import project.shop.api.v1.items.dto.create.CreateItemResponse;
 import project.shop.api.v1.items.dto.delete.DeleteItemResponse;
@@ -36,12 +39,33 @@ public class ItemApiController {
      */
 
     @GetMapping("/api/v1/items")
-    public ResponseEntity allItems() {
-        List<ItemDto> collect = itemService.findItems()
-                .stream().map(item -> new ItemDto(item.getName(), item.getPrice(), item.getStockQuantity()))
-                .collect(Collectors.toList());
+    public ResponseEntity allItems(@RequestParam @Nullable String query) {
 
-        return new ResponseEntity(new ItemResult<List<ItemDto>>(collect.size(), collect), HttpStatus.OK);
+        log.info("query= {}", query);
+
+        if (query == null) {
+            List<Item> findItems = itemService.findItems();
+            List<ItemDto> collect = changeItemDto(findItems);
+
+            return new ResponseEntity(new ItemResult(collect.size(), collect), HttpStatus.OK);
+        }
+
+        StringToItemParameter converter = new StringToItemParameter();
+        String itemName = converter.convert(query).getItemName();
+        Integer price = converter.convert(query).getPrice();
+        String sign = converter.convert(query).getSign();
+
+        List<Item> findItems = itemService.findItems(itemName, price, sign);
+        List<ItemDto> collect = changeItemDto(findItems);
+        log.info("collects= {}", collect);
+
+        return new ResponseEntity(new ItemResult(collect.size(), collect), HttpStatus.OK);
+    }
+
+    private List<ItemDto> changeItemDto(List<Item> items) {
+        return items.stream()
+                .map(item -> new ItemDto(item.getName(), item.getPrice(), item.getStockQuantity()))
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/api/v1/items/new")

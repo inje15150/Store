@@ -11,8 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.shop.api.v1.Errors;
-import project.shop.api.v1.members.converter.MemberParameterParsing;
-import project.shop.api.v1.members.converter.StringToMemberParameter;
+import project.shop.api.v1.converter.StringToMemberParameter;
 import project.shop.api.v1.members.dto.delete.DeleteMemberResponse;
 import project.shop.api.v1.members.dto.read.MemberDto;
 import project.shop.api.v1.members.dto.read.MemberResult;
@@ -38,7 +37,7 @@ public class MemberApiController {
     * */
 
     @GetMapping("/api/v1/members")
-    public ResponseEntity conditionMemberSearch(@RequestParam @Nullable String query) {
+    public ResponseEntity memberConditionSearch(@RequestParam @Nullable String query) {
 
         log.info("query= {}", query);
 
