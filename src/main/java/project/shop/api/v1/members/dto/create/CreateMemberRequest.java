@@ -25,6 +25,6 @@ public class CreateMemberRequest {
     @NotEmpty(message = "거리를 반드시 입력해주세요.")
     private String street;
 
-    @NotEmpty(message = "거리를 반드시 입력해주세요.")
+    @NotEmpty(message = "우편번호를 반드시 입력해주세요.")
     private String zipcode;
 }

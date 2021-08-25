@@ -1,6 +1,7 @@
 package project.shop.api.v1.orders.dto.read;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 import project.shop.domain.Address;
 import project.shop.domain.Order;
 import project.shop.domain.OrderItem;
@@ -15,7 +16,9 @@ public class OrderDto {
 
     private Long orderId;
     private String name;
+
     private LocalDateTime orderDate;
+
     private OrderStatus status;
     private Address address;
     private List<OrderItemDto> orderItems;

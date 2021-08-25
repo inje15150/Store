@@ -10,9 +10,9 @@ import org.springframework.lang.Nullable;
 @AllArgsConstructor
 public class ItemParameterMapping {
 
-    private String itemName;
+    private final String itemName;
     @Nullable private Integer price;
-    private String sign;
+    private final String sign;
 
     public ItemParameterMapping(String itemName, String sign) {
         this.itemName = itemName;

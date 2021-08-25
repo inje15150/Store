@@ -51,6 +51,7 @@ public class ItemApiController {
         }
 
         StringToItemParameter converter = new StringToItemParameter();
+
         String itemName = converter.convert(query).getItemName();
         Integer price = converter.convert(query).getPrice();
         String sign = converter.convert(query).getSign();

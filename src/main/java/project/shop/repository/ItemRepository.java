@@ -45,12 +45,12 @@ public class ItemRepository {
         item.setStockQuantity(stockQuantity);
     }
 
-    public List<Item> findByCondition(String itemName, Integer price, String sign) {
+    public List<Item> findByCondition(String name, Integer price, String sign) {
 
         String jpql = "select i from Item i";
         boolean isFirstCondition = true;
 
-        if (StringUtils.hasText(itemName)) {
+        if (StringUtils.hasText(name)) {
             if (isFirstCondition) {
                 jpql += " where";
                 isFirstCondition = false;
@@ -83,8 +83,8 @@ public class ItemRepository {
 
         TypedQuery<Item> query = em.createQuery(jpql, Item.class);
 
-        if (StringUtils.hasText(itemName)) {
-            query = query.setParameter("name", itemName);
+        if (StringUtils.hasText(name)) {
+            query = query.setParameter("name", name);
         }
         if (StringUtils.hasText(String.valueOf(price))) {
             query = query.setParameter("price", price);
@@ -92,19 +92,19 @@ public class ItemRepository {
         return query.getResultList();
     }
 
-    public Item findByName(String name) {
+    public List<Item> findByName(String name) {
 
         if (name == null) {
             return em.createQuery(
                     "select i from Item i", Item.class)
-                    .getSingleResult();
+                    .getResultList();
         }
 
         return em.createQuery(
                 "select i from Item i" +
                         " where i.name = :name", Item.class)
                 .setParameter("name", name)
-                .getSingleResult();
+                .getResultList();
     }
 
     public void delete(Long itemId) {

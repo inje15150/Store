@@ -9,6 +9,8 @@ import project.shop.domain.item.Item;
 import project.shop.repository.ItemRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -44,7 +46,11 @@ public class ItemService {
     }
 
     public Long findByName(String name) {
-        return itemRepository.findByName(name).getId();
+
+        List<Item> findItems = itemRepository.findByName(name);
+        return findItems.stream()
+                .map(i -> i.getId())
+                .findFirst().get();
     }
 
     @Transactional
