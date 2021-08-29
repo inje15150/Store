@@ -60,7 +60,7 @@ public class ItemRepository {
             jpql += " i.name like '%'||:name||'%'";
         }
 
-        if (StringUtils.hasText(String.valueOf(price))) {
+        if (price != null) {
 
             if (sign != null) {
                 if (isFirstCondition) {
@@ -86,7 +86,7 @@ public class ItemRepository {
         if (StringUtils.hasText(name)) {
             query = query.setParameter("name", name);
         }
-        if (StringUtils.hasText(String.valueOf(price))) {
+        if (price != null) {
             query = query.setParameter("price", price);
         }
         return query.getResultList();

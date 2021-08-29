@@ -37,6 +37,10 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
+//    public List<Member> findMembers(String name, String city) {
+//        return memberRepository.findAll(name, city);
+//    }
+
     public List<Member> findMembers(String name, String city) {
         return memberRepository.findAll(name, city);
     }

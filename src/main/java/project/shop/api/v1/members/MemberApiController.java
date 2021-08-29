@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.shop.api.v1.Errors;
 import project.shop.api.v1.converter.MemberParameterMapping;
+import project.shop.api.v1.converter.QueryParser;
 import project.shop.api.v1.converter.StringToMemberParameter;
 import project.shop.api.v1.members.dto.delete.DeleteMemberResponse;
 import project.shop.api.v1.members.dto.read.MemberDto;
@@ -25,6 +26,7 @@ import project.shop.domain.Member;
 import project.shop.service.MemberService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.plaf.metal.MetalMenuBarUI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,11 +51,17 @@ public class MemberApiController {
             return new ResponseEntity(new MemberResult(collect.size(), collect), HttpStatus.OK);
         }
 
-        StringToMemberParameter convert = new StringToMemberParameter();
-        String name = convert.convert(query).getName();
-        String city = convert.convert(query).getCity();
+        QueryParser<MemberParameterMapping> q = new QueryParser<>();
+        MemberParameterMapping parse = q.parse(query, new MemberParameterMapping());
+        String name = parse.getName();
+        String city = parse.getCity();
+
+//        StringToMemberParameter convert = new StringToMemberParameter();
+//        String name = convert.convert(query).getName();
+//        String city = convert.convert(query).getCity();
 
         List<Member> findMembers = memberService.findMembers(name, city);
+
         List<MemberDto> collect = changeMemberDto(findMembers);
 
         return new ResponseEntity(new MemberResult(collect.size(), collect), HttpStatus.OK);
