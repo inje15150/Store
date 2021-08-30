@@ -11,6 +11,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.shop.api.v1.converter.ItemParameterMapping;
+import project.shop.api.v1.converter.QueryParser;
 import project.shop.api.v1.converter.StringToItemParameter;
 import project.shop.api.v1.items.dto.create.CreateItemRequest;
 import project.shop.api.v1.items.dto.create.CreateItemResponse;
@@ -50,11 +51,21 @@ public class ItemApiController {
             return new ResponseEntity(new ItemResult(collect.size(), collect), HttpStatus.OK);
         }
 
-        StringToItemParameter converter = new StringToItemParameter();
+        QueryParser<ItemParameterMapping> q = new QueryParser<>();
+        ItemParameterMapping parse = q.parse(query, new ItemParameterMapping());
+        String itemName = parse.getItemName();
+        Integer price = parse.getPrice();
+        String sign = parse.getSign();
 
-        String itemName = converter.convert(query).getItemName();
-        Integer price = converter.convert(query).getPrice();
-        String sign = converter.convert(query).getSign();
+        if (sign == null) {
+            sign = "=";
+        }
+
+//        StringToItemParameter converter = new StringToItemParameter();
+//
+//        String itemName = converter.convert(query).getItemName();
+//        Integer price = converter.convert(query).getPrice();
+//        String sign = converter.convert(query).getSign();
 
         List<Item> findItems = itemService.findItems(itemName, price, sign);
         List<ItemDto> collect = changeItemDto(findItems);

@@ -46,7 +46,7 @@ public class OrderApiController {
      * */
     @GetMapping("/api/v1/orders")
     public OrderResult<List<OrderDto>> orders(@RequestParam(name = "offset", defaultValue = "0") int offset,
-                                              @RequestParam(name = "limit", defaultValue = "100") int limit) {
+                                              @RequestParam(name = "limit", defaultValue = "10") int limit) {
         List<Order> orders = orderRepository.findAllMemberDelivery(offset, limit);
 //        List<Order> orders = orderRepository.findAllByString(new OrderSearch());
         List<OrderDto> collect = orders.stream()

@@ -3,16 +3,18 @@ package project.shop.api.v1.converter;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
+@NoArgsConstructor
 public class ItemParameterMapping {
 
-    private final String itemName;
-    @Nullable private Integer price;
-    private final String sign;
+    private String itemName;
+    private Integer price;
+    private String sign;
 
     public ItemParameterMapping(String itemName, String sign) {
         this.itemName = itemName;
