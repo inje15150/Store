@@ -10,6 +10,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.shop.api.v1.Errors;
+import project.shop.api.v1.converter.OrderParameterMapping;
+import project.shop.api.v1.converter.QueryParser;
 import project.shop.api.v1.orders.dto.cancel.OrderCancelResponse;
 import project.shop.api.v1.orders.dto.create.OrderCreateRequest;
 import project.shop.api.v1.orders.dto.create.OrderCreateResponse;
@@ -21,12 +23,14 @@ import project.shop.domain.OrderStatus;
 import project.shop.domain.item.Item;
 import project.shop.repository.OrderRepository;
 import project.shop.repository.order.simplequery.OrderSimpleQueryDto;
+import project.shop.repository.springdatajpa.SpringJpaOrderRepository;
 import project.shop.service.ItemService;
 import project.shop.service.MemberService;
 import project.shop.service.OrderService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,19 +44,46 @@ public class OrderApiController {
     private final OrderSimpleQueryDto orderSimpleQueryDto;
     private final ItemService itemService;
     private final MemberService memberService;
+    private final SpringJpaOrderRepository jpaOrderRepository;
 
     /*
      * 상품 목록 API
      * */
     @GetMapping("/api/v1/orders")
-    public OrderResult<List<OrderDto>> orders(@RequestParam(name = "offset", defaultValue = "0") int offset,
-                                              @RequestParam(name = "limit", defaultValue = "10") int limit) {
-        List<Order> orders = orderRepository.findAllMemberDelivery(offset, limit);
+    public ResponseEntity orders(@Nullable @RequestParam("query") String query) {
+
+        if (query == null) {
+            List<Order> orders = jpaOrderRepository.findOrders();
+            List<OrderDto> collect = orderDtoChange(orders);
+            return new ResponseEntity(new OrderResult(collect.size(), collect), HttpStatus.OK);
+        }
 //        List<Order> orders = orderRepository.findAllByString(new OrderSearch());
-        List<OrderDto> collect = orders.stream()
+        //
+
+        QueryParser<OrderParameterMapping> q = new QueryParser<>();
+        OrderParameterMapping parse = q.parse(query, new OrderParameterMapping());
+
+        String username = parse.getUsername();
+        String status = parse.getStatus();
+        List<Order> orders = new ArrayList<>();
+
+        if (username == null) {
+            orders = jpaOrderRepository.findByStatus(status);
+        } else if (status == null) {
+            orders = jpaOrderRepository.findByName(username);
+        } else {
+            orders = jpaOrderRepository.findByUsernameAndStatus(username, status);
+        }
+
+        List<OrderDto> collect = orderDtoChange(orders);
+
+        return new ResponseEntity(new OrderResult(collect.size(), collect), HttpStatus.OK);
+    }
+
+    private List<OrderDto> orderDtoChange(List<Order> orders) {
+        return orders.stream()
                 .map(o -> new OrderDto(o))
                 .collect(Collectors.toList());
-        return new OrderResult<>(collect.size(), collect);
     }
 
     /* *

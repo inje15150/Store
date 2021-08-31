@@ -7,6 +7,7 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -23,10 +24,11 @@ import project.shop.api.v1.members.dto.update.UpdateMemberRequest;
 import project.shop.api.v1.members.dto.update.UpdateMemberResponse;
 import project.shop.domain.Address;
 import project.shop.domain.Member;
+import project.shop.repository.springdatajpa.SpringJpaMemberRepository;
 import project.shop.service.MemberService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.plaf.metal.MetalMenuBarUI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,7 @@ import java.util.stream.Collectors;
 public class MemberApiController {
 
     private final MemberService memberService;
+    private final SpringJpaMemberRepository memberRepository;
     /*
     * 회원목록 API
     * */
@@ -46,7 +49,7 @@ public class MemberApiController {
         log.info("query= {}", query);
 
         if (query == null) {
-            List<Member> findMembers = memberService.findMembers();
+            List<Member> findMembers = memberRepository.findAll();
             List<MemberDto> collect = changeMemberDto(findMembers);
             return new ResponseEntity(new MemberResult(collect.size(), collect), HttpStatus.OK);
         }
@@ -55,12 +58,18 @@ public class MemberApiController {
         MemberParameterMapping parse = q.parse(query, new MemberParameterMapping());
         String name = parse.getName();
         String city = parse.getCity();
+        List<Member> findMembers = new ArrayList<>();
 
+        if (name == null) {
+            findMembers = memberRepository.findByCity(city);
+        } else if (city == null) {
+            findMembers = memberRepository.findByName(name);
+        } else {
+            findMembers = memberRepository.findByNameAndCity(name, city);
+        }
 //        StringToMemberParameter convert = new StringToMemberParameter();
 //        String name = convert.convert(query).getName();
 //        String city = convert.convert(query).getCity();
-
-        List<Member> findMembers = memberService.findMembers(name, city);
 
         List<MemberDto> collect = changeMemberDto(findMembers);
 
@@ -81,11 +90,9 @@ public class MemberApiController {
     @PostMapping("/api/v1/members/save")
     public ResponseEntity saveMember(@RequestBody @Validated CreateMemberRequest param, BindingResult bindingResult,
                                      HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        String errorsJson;
 
-        if (memberService.validateDuplicateMember(param.getLoginId()) != null) {
-            bindingResult.addError(new FieldError("createMemberRequest", "loginId", "이미 가입된 사용자입니다."));
+        if (memberRepository.findByLoginId(param.getLoginId()) != null) {
+            bindingResult.addError(new FieldError("createMemberRequest", "loginId", "이미 사용중인 아이디입니다."));
         }
 
         if (!param.getPassword().equals(param.getRe_password())) {
@@ -93,7 +100,6 @@ public class MemberApiController {
         }
 
         if (bindingResult.hasErrors()) {
-            ObjectMapper mapper = new ObjectMapper();
 
             List<String> allErrors = bindingResult.getAllErrors().stream()
                     .map(error -> error.getDefaultMessage()).collect(Collectors.toList());
@@ -101,8 +107,8 @@ public class MemberApiController {
             return new ResponseEntity(new Errors(allErrors), HttpStatus.BAD_REQUEST); }
 
         Member saveMember = createMember(param);
-        Long id = memberService.join(saveMember);
-        Member findMember = memberService.findOne(id);
+        Long id = memberRepository.save(saveMember).getId();
+        Member findMember = memberRepository.findById(id).get();
 
         return new ResponseEntity(new CreateMemberResponse(id, findMember.getName(), request.getMethod()), HttpStatus.OK);
     }
@@ -110,12 +116,13 @@ public class MemberApiController {
     /*
     * 회원 수정 API
     * */
+    @Transactional
     @PatchMapping("/api/v1/members/{id}/edit")
     public ResponseEntity updateMember(@PathVariable("id") Long id,
                                        @RequestBody @Validated UpdateMemberRequest param, BindingResult bindingResult,
                                        HttpServletRequest request) {
 
-        Member findMember = memberService.findOne(id);
+        Member findMember = memberRepository.findById(id).get();
 
         if (!param.getPassword().equals(param.getRe_password())) {
             bindingResult.addError(new FieldError("updateMemberRequest", "password", "패스워드가 동일하지 않습니다."));
@@ -128,7 +135,8 @@ public class MemberApiController {
             return new ResponseEntity(new Errors(errors), HttpStatus.BAD_REQUEST);
         }
 
-        memberService.update(id, param.getPassword(), new Address(param.getCity(), param.getStreet(), param.getZipcode()));
+        update(id, param);
+//        memberService.update(id, param.getPassword(), new Address(param.getCity(), param.getStreet(), param.getZipcode()));
 
         return new ResponseEntity(
                 new UpdateMemberResponse(request.getRequestURI(), request.getMethod(), id, findMember.getName(), HttpStatus.OK), HttpStatus.OK);
@@ -139,7 +147,7 @@ public class MemberApiController {
      * */
     @DeleteMapping("/api/v1/members/{id}/delete")
     public ResponseEntity deleteMember(@PathVariable("id") Long id, HttpServletRequest request) {
-        memberService.delete(id);
+        memberRepository.deleteById(id);
 
         return new ResponseEntity(new DeleteMemberResponse(request.getRequestURI(), id, request.getMethod(), HttpStatus.OK), HttpStatus.OK);
     }
@@ -154,5 +162,13 @@ public class MemberApiController {
         member.setLoginId(request.getLoginId());
 
         return member;
+    }
+
+//    @Transactional
+    private void update(Long id, UpdateMemberRequest request) {
+
+        Member findMember = memberRepository.findById(id).get();
+        findMember.setPassword(request.getPassword());
+        findMember.setAddress(new Address(request.getCity(), request.getStreet(), request.getZipcode()));
     }
 }

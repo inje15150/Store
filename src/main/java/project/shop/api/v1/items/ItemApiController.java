@@ -6,6 +6,7 @@ import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
@@ -22,10 +23,12 @@ import project.shop.api.v1.Errors;
 import project.shop.api.v1.items.dto.update.UpdateItemRequest;
 import project.shop.api.v1.items.dto.update.UpdateItemResponse;
 import project.shop.domain.item.Item;
+import project.shop.repository.springdatajpa.SpringJpaItemRepository;
 import project.shop.service.ItemService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
 public class ItemApiController {
 
     private final ItemService itemService;
+    private final SpringJpaItemRepository itemRepository;
 
     /**
      * 상품 조회 API
@@ -45,7 +49,7 @@ public class ItemApiController {
         log.info("query= {}", query);
 
         if (query == null) {
-            List<Item> findItems = itemService.findItems();
+            List<Item> findItems = itemRepository.findAll();
             List<ItemDto> collect = changeItemDto(findItems);
 
             return new ResponseEntity(new ItemResult(collect.size(), collect), HttpStatus.OK);
@@ -68,6 +72,7 @@ public class ItemApiController {
 //        String sign = converter.convert(query).getSign();
 
         List<Item> findItems = itemService.findItems(itemName, price, sign);
+//        List<Item> findItems = itemRepository.findParamQuery(itemName, String.valueOf(price), sign);
         List<ItemDto> collect = changeItemDto(findItems);
         log.info("collects= {}", collect);
 
@@ -95,12 +100,14 @@ public class ItemApiController {
             return new ResponseEntity(new Errors(errorList), HttpStatus.BAD_REQUEST);
         }
 
-        Long itemId = itemService.saveItem(saveItem(param));
-        Item findItem = itemService.findOne(itemId);
+        Long itemId = itemRepository.save(saveItem(param)).getId();
+
+        Item findItem = itemRepository.findById(itemId).get();
 
         return new ResponseEntity(new CreateItemResponse(itemId, findItem.getName(), request.getMethod(), HttpStatus.OK), HttpStatus.OK);
     }
 
+    @Transactional
     @PatchMapping("/api/v1/items/{itemId}/edit")
     public ResponseEntity updateItem(@PathVariable("itemId") Long itemId,
                                      @RequestBody @Validated UpdateItemRequest param, BindingResult bindingResult,
@@ -118,15 +125,18 @@ public class ItemApiController {
             return new ResponseEntity(new Errors(errorList), HttpStatus.BAD_REQUEST);
         }
 
-        itemService.update(itemId, param.getItemName(), param.getPrice(), param.getStockQuantity());
-        Item findItem = itemService.findOne(itemId);
+        Long updateItemId = update(itemId, param);
+
+//        itemService.update(itemId, param.getItemName(), param.getPrice(), param.getStockQuantity());
+
+        Item findItem = itemRepository.findById(updateItemId).get();
 
         return new ResponseEntity(new UpdateItemResponse(itemId, findItem.getName(), findItem.getPrice(), findItem.getStockQuantity(), request.getMethod(), HttpStatus.OK), HttpStatus.OK);
     }
 
     @DeleteMapping("/api/v1/items/{itemId}/delete")
     public ResponseEntity itemDelete(@PathVariable("itemId") Long itemId, HttpServletRequest request) {
-        itemService.delete(itemId);
+        itemRepository.deleteById(itemId);
 
         return new ResponseEntity(new DeleteItemResponse(request.getRequestURI(), request.getMethod(), HttpStatus.OK), HttpStatus.OK);
     }
@@ -138,5 +148,14 @@ public class ItemApiController {
         item.setStockQuantity(param.getStockQuantity());
 
         return item;
+    }
+
+    private Long update(Long id, UpdateItemRequest request) {
+        Item findItem = itemRepository.findById(id).get();
+        findItem.setName(request.getItemName());
+        findItem.setPrice(request.getPrice());
+        findItem.setStockQuantity(request.getStockQuantity());
+
+        return findItem.getId();
     }
 }

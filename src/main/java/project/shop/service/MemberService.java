@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.shop.domain.Address;
 import project.shop.domain.Member;
 import project.shop.repository.MemberRepository;
+import project.shop.repository.springdatajpa.SpringJpaMemberRepository;
 
 import java.util.List;
 import java.util.Optional;
